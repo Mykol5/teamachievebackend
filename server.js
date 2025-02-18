@@ -14,7 +14,7 @@ const staffData = JSON.parse(fs.readFileSync(path.join(__dirname, 'staffs.json')
 const loansData = JSON.parse(fs.readFileSync(path.join(__dirname, 'loans.json')));
 
 app.use(cors({
-    origin: "http://localhost:8080", // Allow only your frontend
+    origin: ["http://localhost:8080", "https://teamachievebuysimply.netlify.app"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
