@@ -13,7 +13,12 @@ const SECRET_KEY = 'your_secret_key';
 const staffData = JSON.parse(fs.readFileSync(path.join(__dirname, 'staffs.json')));
 const loansData = JSON.parse(fs.readFileSync(path.join(__dirname, 'loans.json')));
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:8080", // Allow only your frontend
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -44,13 +49,20 @@ const apiLimiter = rateLimit({
 app.use(apiLimiter);
 
 app.post('/login', (req, res) => {
+    console.log("Received login attempt:", req.body); // Log input data
+
     const { email, password } = req.body;
     const user = staffData.find(staff => staff.email === email && staff.password === password);
-    if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+
+    if (!user) {
+        console.log("Invalid credentials for:", email); // Log invalid attempts
+        return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
     const token = jwt.sign({ email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
-    res.json({ token });
+    res.json({ success: true, token, user });
 });
+
 
 app.post('/logout', (req, res) => {
     res.json({ message: 'Logged out successfully' });
